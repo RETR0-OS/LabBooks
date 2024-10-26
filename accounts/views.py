@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import UserProfile
 from course_manager.models import Course
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 
 @api_view(['POST'])
 def login_view(request):
@@ -47,5 +48,9 @@ def register_user(request):
 
 @api_view(['GET'])
 def logout_view(request):
-    logout(request)
+    if request.user.is_authenticated:
+        refresh_token = request.data.get('refresh')
+        token = RefreshToken(refresh_token)
+        token.blacklist()
+        logout(request)
     return Response({'message': 'User logged out successfully'}, status=status.HTTP_200_OK)
