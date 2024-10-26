@@ -23,3 +23,4 @@ class LabBook(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner')
     owner_role = models.CharField(max_length=20, choices=ROLES, default='student')
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='author')
+
