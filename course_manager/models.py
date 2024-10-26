@@ -14,6 +14,7 @@ class Course(models.Model):
     code = models.CharField(max_length=10, unique=True, primary_key=True)
     description = models.TextField()
     teacher = models.ForeignKey(User, on_delete=models.PROTECT)
+    course_image = models.ImageField(upload_to='course_images/', null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -23,3 +24,4 @@ class LabBook(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner')
     owner_role = models.CharField(max_length=20, choices=ROLES, default='student')
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='author')
+    published = models.BooleanField(default=False)
