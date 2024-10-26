@@ -74,11 +74,43 @@ def load_teacher_notebook(request, course_code, notebook_id):
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
+def create_notebook(request, course_code):
+    try:
+        user_profile = UserProfile.objects.get(user=request.user, role='teacher')
+        course = Course.objects.get(code=course_code, teacher=request.user)
+        notebook = LabBooks.objects.create(course=course, owner=request.user, owner_role='teacher', author=request.user)
+        notebook.save()
+        return Response({'message': 'Notebook created successfully'}, status=status.HTTP_201_CREATED)
+    except Course.DoesNotExist:
+        return Response({'error': 'Course does not exist'}, status=status.HTTP_404_NOT_FOUND)
+    except UserProfile.DoesNotExist:
+        return Response({'error': 'Only teachers can create lab books'}, status=status.HTTP_403_FORBIDDEN)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def delete_notebook(request, course_code, notebook_id):
+    try:
+        user_profile = UserProfile.objects.get(user=request.user, role='teacher')
+        course = Course.objects.get(code=course_code, teacher=request.user)
+        notebook = LabBooks.objects.get(course=course, id=notebook_id, owner=request.user, owner_role='teacher')
+        notebook.delete()
+        return Response({'message': 'Notebook deleted successfully'}, status=status.HTTP_200_OK)
+    except Course.DoesNotExist:
+        return Response({'error': 'Course does not exist'}, status=status.HTTP_404_NOT_FOUND)
+    except UserProfile.DoesNotExist:
+        return Response({'error': 'Only teachers can delete lab books'}, status=status.HTTP_403_FORBIDDEN)
+    except LabBooks.DoesNotExist:
+        return Response({'error': 'Lab book does not exist'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
 def update_teacher_notebooks(request, course_code, notebook_id):
     try:
         user_profile = UserProfile.objects.get(user=request.user, role='teacher')
         course = Course.objects.get(code=course_code, teacher=request.user)
-        notebook = LabBooks.objects.get(course=course, id=notebook_id)
+        notebook = LabBooks.objects.get(course=course, id=notebook_id, owner=request.user, owner_role='teacher')
         if notebook.published:
             return Response({'error': 'Notebook is published and cannot be edited'}, status=status.HTTP_403_FORBIDDEN)
         data_blocks = request.data.get('data_blocks')
@@ -194,6 +226,7 @@ def code_grader(request, notebook_id, block_id):
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
 def publish_notebook(request, course_code, notebook_id):
     try:
         user_profile = UserProfile.objects.get(user=request.user, role='teacher')
