@@ -24,6 +24,7 @@ def login_view(request):
 
 @api_view(['POST'])
 def register_user(request):
+    print(request.data)
     try:
         username = request.data.get('user')
         password = request.data.get('pwd')
@@ -32,13 +33,14 @@ def register_user(request):
         last_name = request.data.get('lastName')
         course_code = request.data.get('courseCode')
         course = Course.objects.get(code=course_code)
-        role = request.data.get('role')  # Handle this in middleware as planned
+        role = "student"
+        #role = request.data.get('role')  # Handle this in middleware as planned
 
         # Create user with hashed password
         user = User.objects.create_user(username=username, email=email, password=password, 
                                         first_name=first_name, last_name=last_name)
         profile = UserProfile.objects.create(user=user, role=role)
-        profile.course.add(course)
+        profile.courses.add(course)
         profile.save()
         
         return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
