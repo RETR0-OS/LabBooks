@@ -10,8 +10,8 @@ from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, Ou
 
 @api_view(['POST'])
 def login_view(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
+    username = request.data.get('user')
+    password = request.data.get('pwd')
     user = authenticate(request, username=username, password=password)
     if user:
         refresh = RefreshToken.for_user(user)  # Generate JWT tokens
