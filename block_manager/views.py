@@ -114,23 +114,24 @@ def update_teacher_notebooks(request, course_code, notebook_id):
         if notebook.published:
             return Response({'error': 'Notebook is published and cannot be edited'}, status=status.HTTP_403_FORBIDDEN)
         data_blocks = request.data.get('data_blocks')
+
+        mcq_blocks = McqBlock.objects.filter(linked_notebook=notebook)
+        code_blocks = CodeBlock.objects.filter(linked_notebook=notebook)
+        markdown_blocks = MarkdownBlock.objects.filter(linked_notebook=notebook)
+
+        mcq_blocks.delete()
+        code_blocks.delete()
+        markdown_blocks.delete()
+
         for block in data_blocks:
             if block['type'] == 'markdown':
-                markdown_block = MarkdownBlock.objects.get(id=block['id'], linked_notebook=notebook)
-                markdown_block.content = block['content']
+                markdown_block = MarkdownBlock.objects.create(id=block['id'], linked_notebook=notebook, block_order=block['index'], block_content=block['content'])
                 markdown_block.save()
             elif block['type'] == 'code':
-                code_block = CodeBlock.objects.get(id=block['id'], linked_notebook=notebook)
-                code_block.content = block['content']
+                code_block = CodeBlock.objects.create(id=block['id'], linked_notebook=notebook, block_order=block['index'], block_content=block['content'])
                 code_block.save()
             elif block['type'] == 'mcq':
-                mcq_block = McqBlock.objects.get(id=block['id'], linked_notebook=notebook)
-                mcq_block.question = block['question']
-                mcq_block.block_option_1 = block['option_1']
-                mcq_block.block_option_2 = block['option_2']
-                mcq_block.block_option_3 = block['options_3']
-                mcq_block.block_option_4 = block['option_4']
-                mcq_block.answer = block['answer']
+                mcq_block = McqBlock.objects.get(id=block['id'], linked_notebook=notebook, block_question=block['question'], block_order=block['index'], block_option_1=block['option_1'], block_option_2=block['option_2'], block_option_3=block['option_3'], block_option_4=block['option_4'], block_answer=block['answer'])
                 mcq_block.save()
         return Response({'message': 'Notebook updated successfully'}, status=status.HTTP_200_OK)
     except Course.DoesNotExist:

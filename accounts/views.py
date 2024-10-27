@@ -24,6 +24,7 @@ def login_view(request):
 
 @api_view(['POST'])
 def register_user(request):
+    print(request.method)
     try:
         username = request.data.get('user')
         password = request.data.get('pwd')
