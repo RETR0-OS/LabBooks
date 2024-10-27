@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-#fwjloi2e&krk3u$g1o6rl7oz%el15#b6p-g$)$16a2hr!s==v
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "*"]  # Local hosts for development
 
 
 # Application definition
@@ -40,9 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
     'accounts',
     'course_manager',
-    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -58,9 +58,39 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'LabBooks.urls'
 
-CORS_ALLOW_ALL_ORIGINS = True
+
+# CORS Configuration
+CORS_ALLOW_CREDENTIALS = False  # Set to True if using cookies for authentication
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
+CORS_ALLOW_HEADERS = [
+    "authorization",
+    "content-type",
+    "x-csrftoken",
+    "x-requested-with",
+]
 
 
+# REST Framework Configuration
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  # Allow open access by default
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ]
+}
+
+# JWT Configuration
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=90),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
+
+# Templates Configuration
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -90,11 +120,6 @@ DATABASES = {
     }
 }
 
-
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=90),  # Access token expires in 90 minutes
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),  # Refresh token expires in 1 day
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -136,13 +161,3 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-        'rest_framework.permissions.AllowAny',
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
-}

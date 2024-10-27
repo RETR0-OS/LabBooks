@@ -24,7 +24,6 @@ def login_view(request):
 
 @api_view(['POST'])
 def register_user(request):
-    print(request.method)
     try:
         username = request.data.get('user')
         password = request.data.get('pwd')
@@ -39,7 +38,7 @@ def register_user(request):
         user = User.objects.create_user(username=username, email=email, password=password, 
                                         first_name=first_name, last_name=last_name)
         profile = UserProfile.objects.create(user=user, role=role)
-        profile.course.add(course)
+        profile.courses.add(course)
         profile.save()
         
         return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
