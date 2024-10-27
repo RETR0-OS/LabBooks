@@ -25,12 +25,12 @@ def login_view(request):
 @api_view(['POST'])
 def register_user(request):
     try:
-        username = request.data.get('username')
-        password = request.data.get('password')
+        username = request.data.get('user')
+        password = request.data.get('pwd')
         email = request.data.get('email')
-        first_name = request.data.get('first_name')
-        last_name = request.data.get('last_name')
-        course_code = request.data.get('course_code')
+        first_name = request.data.get('firstName')
+        last_name = request.data.get('lastName')
+        course_code = request.data.get('courseCode')
         course = Course.objects.get(code=course_code)
         role = request.data.get('role')  # Handle this in middleware as planned
 
